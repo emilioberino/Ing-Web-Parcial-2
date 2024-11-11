@@ -66,3 +66,26 @@ El servidor se iniciará en http://localhost:3000. Deberías ver el mensaje "Hel
 #### Scripts
 
 npm run dev: Inicia el servidor de desarrollo usando ts-node.
+
+##### Colaboración
+
+1.- Crear una nueva rama: **`git checkout -b tunombre-branch`**
+
+Reemplaza **`tunombre`** con tu nombre.
+
+2.- Realiza cambios en tu rama personal:
+
+```sh
+git add .
+git commit -m "Descripción de tus cambios"
+```
+
+4.- Empuja tu rama al repositorio remoto
+
+``` sh
+git push origin nombre-branch
+```
+
+### Notas importantes
+
+**NO REALICES CAMBIOS EN LA RAMA MAIN**
