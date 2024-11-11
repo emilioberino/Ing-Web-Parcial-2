@@ -89,3 +89,12 @@ git push origin nombre-branch
 ### Notas importantes
 
 **NO REALICES CAMBIOS EN LA RAMA MAIN**
+
+Cualquier cambio se notificará por grupo y si es necesario hacer un pull se hace así
+
+```sh
+git checkout master
+git pull origin master
+git checkout nombre-branch
+git merge master
+```
