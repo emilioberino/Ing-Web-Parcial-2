@@ -49,6 +49,20 @@ npm run dev
 
 El servidor se iniciará en http://localhost:3000. Deberías ver el mensaje "Hello World" al acceder a la URL raíz.
 
+#### Estructura del Proyecto
+
+```sh
+
+├── src
+│   ├── app.ts
+│   └── routes
+│       └── index.routes.ts
+├── package.json
+├── tsconfig.json
+└── .gitignore
+
+```
+
 #### Scripts
 
 npm run dev: Inicia el servidor de desarrollo usando ts-node.
