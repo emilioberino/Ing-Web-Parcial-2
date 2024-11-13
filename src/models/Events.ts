@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+<<<<<<< Updated upstream
 enum InvitationStatus {
     PENDING = 'pendiente',
     ACCEPTED = 'aceptada'
@@ -55,6 +56,60 @@ const eventSchema = new mongoose.Schema({
             default: InvitationStatus.PENDING
         }
     }]
+=======
+const invitadoSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
+  },
+  estado: {
+    type: String,
+    enum: ['aceptada', 'pendiente'],
+    default: 'pendiente'
+  }
+});
+
+const eventSchema = new mongoose.Schema({
+  anfitrion: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
+  },
+  descripcion: {
+    type: String,
+    required: true,
+    maxLength: 50,
+    trim: true
+  },
+  inicio: {
+    type: Date,
+    required: true,
+    validate: {
+      validator: function(v: Date) {
+        // Validate 15-minute intervals
+        return v.getMinutes() % 15 === 0;
+      },
+      message: 'Inicio must be in 15-minute intervals'
+    }
+  },
+  duracion: {
+    type: Number,
+    required: true,
+    validate: {
+      validator: function(v: number) {
+        // Validate 15-minute intervals
+        return v % 15 === 0 && v > 0;
+      },
+      message: 'Duración must be in 15-minute intervals and greater than 0'
+    }
+  },
+  invitados: [invitadoSchema]
+}, {
+  timestamps: true
+>>>>>>> Stashed changes
 });
 
 export const Event = mongoose.model('Event', eventSchema);
