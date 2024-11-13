@@ -1,9 +1,25 @@
 import express from 'express';
-import indexRouter from './routes/index.routes';
+import { connectDB } from './src/config/database';
+import userRoutes from './src/routes/user.routes';
+import eventRoutes from './src/routes/event.routes';
+import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import { specs } from './src/config/swagger';
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
-
 app.use(express.json());
-app.use("/", indexRouter);
-app.listen(port, () => console.log("La aplicación está corriendo en el puerto 3000"));
+
+// Connect to MongoDB
+connectDB();
+
+// Routes
+app.use('/api/users', userRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
