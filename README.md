@@ -44,10 +44,17 @@ npx tsc --init
 #### Iniciar el Servidor de Desarrollo
 
 ```sh
-npm run dev
+# Montar contenedores
+docker compose up -d
+
+# View logs
+docker compose logs -f app
+
+# Parar los contenedores
+docker compose down
 ```
 
-El servidor se iniciará en http://localhost:3000. Deberías ver el mensaje "Hello World" al acceder a la URL raíz.
+El docker montará la app y esta se iniciará en http://localhost:3000. Deberías ver el mensaje "Hello World" al acceder a la URL raíz.
 
 #### Estructura del Proyecto
 
