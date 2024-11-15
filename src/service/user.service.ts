@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+import { Contacto } from "../interfaces/user.interface";
 import { Usuario } from "../models/user.model";
 import { MongoError } from "mongodb";
 export class UserService {
@@ -64,15 +66,18 @@ export class UserService {
     //Agregar un contacto a un usuario
     async addContact(email: string, contacto: string) {
         try {
-            const user = await Usuario.findOne({ email }); //Notacion shorthand
-            if (!user) {
+            const usuario = await Usuario.findOne({ email });
+
+            if (!usuario) {
                 throw new Error('Usuario no encontrado');
             }
-            if (!user.contactos.includes(email)) {
-                user.contactos.push(contacto);
-                return await user.save();
+
+            const contactoId = new mongoose.Types.ObjectId(contacto);
+            if (!usuario.contactos.includes(contactoId)) {
+                usuario.contactos.push(contactoId);
+                return await usuario.save();
             }
-            return user;
+
         } catch (error) {
             this.errorHandling(error);
         }
@@ -86,12 +91,13 @@ export class UserService {
      */
     async removeContact(useremail: string, contactoEmail: string) {
         try {
-            const usuario = await Usuario.findOne({ email: useremail }); //Notacion normal
+            const usuario = await Usuario.findOne({ email: useremail });
             if (!usuario) {
                 throw new Error('Usuario no encontrado');
             }
 
-            usuario.contactos = usuario.contactos.filter(contact => contact !== contactoEmail);
+            const contactoId = new mongoose.Types.ObjectId(contactoEmail);
+            usuario.contactos = usuario.contactos.filter(contact => !contact.equals(contactoId));
             return await usuario.save();
         } catch (error) {
             this.errorHandling(error);
@@ -107,6 +113,30 @@ export class UserService {
             return usuario.contactos;
         } catch (error) {
             this.errorHandling(error);
+        }
+    }
+
+
+    async searchContacts(email: string, search: string): Promise<Contacto[]> {
+        try {
+            const usuario = await Usuario.findOne({ email }).populate('contactos');
+
+            if (!usuario) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            // Filtrado de contactos por partial match
+            const filteredContacts = usuario.contactos.filter((contacto: any) =>
+                contacto.nombre.toLowerCase().includes(search.toLowerCase())
+            );
+
+            return filteredContacts.map((contacto: any) => ({
+                email: contacto.email,
+                nombre: contacto.nombre,
+            }));
+        } catch (error) {
+            this.errorHandling(error);
+            return []; // Ensure the function always returns an array
         }
     }
 

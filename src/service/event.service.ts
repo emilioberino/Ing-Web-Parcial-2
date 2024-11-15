@@ -1,4 +1,5 @@
-import { IEventoData } from "../interfaces/event.interface";
+import mongoose from "mongoose";
+import { IEventoData, ReScheduleParams } from "../interfaces/event.interface";
 import { Evento } from "../models/event.model";
 import { MongoError } from "mongodb";
 
@@ -93,13 +94,17 @@ export class EventService {
             if (!event) {
                 throw new Error('Evento no encontrado');
             }
-            if (!event.invitados.some(inv => inv.usuario === usuarioEmail)) { //usuario es una ref al id de Usuario (email)
-                event.invitados.push({
-                    usuario: usuarioEmail,
-                    estado: false
-                });
-                return await event.save();
+            const invitadoId = new mongoose.Types.ObjectId(usuarioEmail);
+
+            const isInvited = event.invitados.find(inv => inv.usuario.equals(invitadoId));
+            if (isInvited) {
+                throw new Error('El usuario ya ha sido invitado');
             }
+
+            event.invitados.push({
+                usuario: invitadoId,
+                estado: false
+            });
 
         } catch (error) {
             this.errorHandling(error);
@@ -124,7 +129,7 @@ export class EventService {
         }
     }
 
-    async updateEstadoInvitado(eventId: string, usuarioEmail: string, estado: boolean){
+    async updateEstadoInvitado(eventId: string, usuarioEmail: string, estado: boolean) {
         try {
             const event = await Evento.findById(eventId);
 
@@ -132,14 +137,70 @@ export class EventService {
                 throw new Error('Evento no encontrado');
             }
 
-            const invitado = event.invitados.find(inv => inv.usuario === usuarioEmail);
+            const invitadoId = new mongoose.Types.ObjectId(usuarioEmail);
+            const invitado = event.invitados.find(inv => inv.usuario.equals(invitadoId));
+
             if (!invitado) {
                 throw new Error('Invitado no encontrado');
             }
-            invitado.estado = estado;
-            return await event.save();
 
-        } catch (error){
+            invitado.estado = estado;
+
+        } catch (error) {
+            this.errorHandling(error);
+        }
+    }
+
+    async rescheduleEvent(eventId: string, timeShift: ReScheduleParams) {
+        try {
+            const event = await Evento.findById(eventId);
+            if (!event) {
+                throw new Error('Evento no encontrado');
+            }
+
+            // Comprobar si el evento no ha pasado
+            if (event.inicio > new Date()) {
+                throw new Error('No se puede reprogramar un evento pasado');
+            }
+
+            // Calcular la nueva fecha
+            const newDate = new Date(event.inicio);
+            if (timeShift.days) {
+                newDate.setDate(newDate.getDate() + timeShift.days);
+            }
+            if (timeShift.weeks) {
+                newDate.setDate(newDate.getDate() + timeShift.weeks * 7);
+            }
+            if (timeShift.months) {
+                newDate.setMonth(newDate.getMonth() + timeShift.months);
+            }
+            if (timeShift.years) {
+                newDate.setFullYear(newDate.getFullYear() + timeShift.years);
+            }
+
+            const newEvent = new Evento({
+                anfitrion: event.anfitrion,
+                descripcion: event.descripcion,
+                inicio: newDate,
+                duracion: event.duracion,
+                invitados: event.invitados
+            });
+            return await newEvent.save();
+        } catch (error) {
+            this.errorHandling(error);
+        }
+    }
+
+    async getUserAgenda(email: string) {
+        try {
+
+            const ownEvents = await Evento.find({ anfitrion: email});
+
+            const invitedEvents = await Evento.find({ 'invitados.usuario': email });
+
+            const allEvents = [...ownEvents, ...invitedEvents].sort((a, b) => a.inicio.getTime() - b.inicio.getTime());
+
+        } catch (error) {
             this.errorHandling(error);
         }
     }

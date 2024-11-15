@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const invitadoSchema = new mongoose.Schema({
     usuario: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Usuario',
         required: true
     },
@@ -12,7 +12,8 @@ const invitadoSchema = new mongoose.Schema({
 });
 const eventSchema = new mongoose.Schema({
     anfitrion:{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuario',
         required: true
     },
     descripcion:{

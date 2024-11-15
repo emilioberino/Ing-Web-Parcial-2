@@ -44,6 +44,9 @@ npx tsc --init
 #### Iniciar el Servidor de Desarrollo
 
 ```sh
+#Si has realizado cambios en la app primero:
+docker compose build
+
 # Montar contenedores
 docker compose up -d
 

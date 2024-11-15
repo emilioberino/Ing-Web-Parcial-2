@@ -4,3 +4,10 @@ export interface IEventoData {
     inicio: Date;
     duracion: number;
 }
+
+export interface ReScheduleParams {
+    days?: number;
+    weeks?: number;
+    months?: number;
+    years?: number;
+}
