@@ -1,21 +1,18 @@
 version: '3.8'
-
 services:
   app:
     build: .
     ports:
-      - '3000:3000'
+      - "3000:3000"
     environment:
-      - PORT=3000
-      - MONGO_URI=mongodb://mongo:27017/db
-    depends_on:
-      - mongo
-    command: npm run dev
-  
-  mongo:
-    image: mongo:5.0
+      - MONGO_URI=mongodb+srv://<usuario>:<contraseña>@cluster.mongodb.net/database
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongodb_data:/data/db
 
 volumes:
-  mongo-data:
+  mongodb_data:

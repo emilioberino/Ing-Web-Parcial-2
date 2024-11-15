@@ -39,6 +39,42 @@ Si **`tsconfig.json`** no está presente, inicialízalo:
 npx tsc --init
 ```
 
+### 5. Pon en marcha el fichero .env
+
+Crea un fichero .env en la raíz del proyecto.
+Copia el contenido de .env.example en tu .env
+Reemplaza la URI de MongoDB con tu propia conexión
+
+```sh
+# Ejemplo de .env
+MONGO_URI=mongodb+srv://<usuario>:<contraseña>@cluster.mongodb.net/database
+
+```
+
+### 6. No te olvides de cambiar también la conexión en el docker-compose.yml
+
+```sh
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI= TU URI AQUI
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
+
+```
+
 ### Uso
 
 #### Iniciar el Servidor de Desarrollo
